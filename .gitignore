@@ -1,0 +1,20 @@
+# Intellij Idea
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Java
+*.class
+*.classpath
+*.project
+
+# Maven
+target
+
+# project
+db.properties
+*nbactions.xml
+*nb-configuration.xml
+
+*.log
