@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Configuration
-public class KafkaConsumer {
+public class KafkaConsumerConfig {
     @Value("${kafka.bootstrap.servers}")
     private String kafkaBootstrapServers;
 
