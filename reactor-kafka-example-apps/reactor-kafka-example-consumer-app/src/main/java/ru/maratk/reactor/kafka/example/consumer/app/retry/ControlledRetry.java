@@ -11,13 +11,17 @@ import reactor.util.retry.Retry;
 public final class ControlledRetry extends Retry {
 
     private final int numRetries;
+    private final Long slowPauseMs;
 
-    public ControlledRetry(@Value("${num.retries}") final int numRetries) {
+    public ControlledRetry(@Value("${num.retries}") final int numRetries
+            , @Value("${slow.pause.ms}") final Long slowPauseMs) {
         this.numRetries = numRetries;
+        this.slowPauseMs = slowPauseMs;
     }
 
     @Override
     public Publisher<?> generateCompanion(final Flux<RetrySignal> retrySignals) {
+        try { Thread.sleep(slowPauseMs); } catch (final InterruptedException e) {}
         return retrySignals.map(rs -> getNumberOfTries(rs));
     }
 

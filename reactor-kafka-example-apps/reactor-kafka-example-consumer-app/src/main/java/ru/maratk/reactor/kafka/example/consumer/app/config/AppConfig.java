@@ -13,7 +13,7 @@ import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 @Import({KafkaConsumerConfig.class, KafkaProducerConfig.class})
 public class AppConfig {
 
-    @Value(value = "${task.dlq.topic}")
+    @Value("${task.dlq.topic}")
     private String deadLetterTopic;
 
     @Autowired
