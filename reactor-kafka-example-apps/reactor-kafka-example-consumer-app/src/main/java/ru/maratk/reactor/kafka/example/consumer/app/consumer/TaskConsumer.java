@@ -18,7 +18,6 @@ import ru.maratk.reactor.kafka.example.consumer.app.retry.ControlledRetry;
 import ru.maratk.reactor.kafka.example.consumer.app.service.TaskService;
 import ru.maratk.reactor.kafka.example.core.lib.Task;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -63,7 +62,7 @@ public class TaskConsumer {
                 .just(flux)
                 .concatMap(processPartition())
                 .retryWhen(controlledRetry)
-                .onErrorContinue(onPartitionError());
+                .doOnError(onPartitionError());
     }
 
     private Function<ReceiverRecord<String, Task>, Publisher<?>> processPartition() {
@@ -94,8 +93,8 @@ public class TaskConsumer {
                 , rr.receiverOffset().topicPartition().partition());
     }
 
-    private BiConsumer<Throwable, Object> onPartitionError(){
-        return (e, record) -> {
+    private Consumer<Throwable> onPartitionError(){
+        return (e) -> {
             final ReceiverRecordException ex = (ReceiverRecordException) e;
             logger.error("Retries exhausted for key {}: offset: {} partition: {}"
                     , ex.getRecord().key()
