@@ -12,8 +12,6 @@ public class TaskService {
     private static final Logger logger = LoggerFactory.getLogger(TaskService.class);
 
     public Mono<Void> process(final Task t){
-        try { Thread.sleep((long)(Math.random() * 5000)); }
-        catch (final InterruptedException e) { logger.error("Interrupted thread", e); }
-        return Mono.empty();
+        return Mono.error(new RuntimeException());
     }
 }

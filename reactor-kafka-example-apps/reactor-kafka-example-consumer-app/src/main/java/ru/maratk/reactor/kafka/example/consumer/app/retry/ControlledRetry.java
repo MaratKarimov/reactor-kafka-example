@@ -21,11 +21,11 @@ public final class ControlledRetry extends Retry {
 
     @Override
     public Publisher<?> generateCompanion(final Flux<RetrySignal> retrySignals) {
-        try { Thread.sleep(slowPauseMs); } catch (final InterruptedException e) {}
         return retrySignals.map(rs -> getNumberOfTries(rs));
     }
 
     private Long getNumberOfTries(final Retry.RetrySignal rs) {
+        try { Thread.sleep(slowPauseMs); } catch (final InterruptedException e) {}
         if (rs.totalRetries() < numRetries) { return rs.totalRetries(); }
         else { throw Exceptions.propagate(rs.failure()); }
     }

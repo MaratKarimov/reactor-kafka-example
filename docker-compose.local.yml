@@ -1,0 +1,62 @@
+version: '3.7'
+
+services:
+  reactor-kafka-example-consumer-app:
+    depends_on:
+      - zookeeper
+      - kafka
+    build:
+      context: './reactor-kafka-example-apps/reactor-kafka-example-consumer-app'
+    environment:
+      - "KAFKA_BOOTSTRAP_SERVERS=kafka:29092"
+      - "TASK_TOPIC=task"
+      - "TASK_DLQ_TOPIC=task-dlq"
+      - "NUM_RETRIES=2"
+      - "SLOW_PAUSE_MS=2000"
+      - "SERVICE_FAIL_ON=4"
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.2.1
+    environment:
+      - "ZOOKEEPER_CLIENT_PORT=2181"
+      - "ZOOKEEPER_TICK_TIME=2000"
+      - "ZOOKEEPER_LOG4J_ROOT_LOGLEVEL=ERROR"
+      - "ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL=ERROR"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.2.1
+    depends_on:
+      - zookeeper
+    environment:
+      - "KAFKA_BROKER_ID=1"
+      - "KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181"
+      - "KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092"
+      - "KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      - "KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1"
+      - "KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1"
+      - "KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1"
+      - "KAFKA_LOG4J_ROOT_LOGLEVEL=ERROR"
+      - "KAFKA_TOOLS_LOG4J_LOGLEVEL=ERROR"
+
+  kafka-rest:
+    image: confluentinc/cp-kafka-rest:7.2.1
+    depends_on:
+      - zookeeper
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      KAFKA_REST_LISTENERS: http://0.0.0.0:8081
+      KAFKA_REST_BOOTSTRAP_SERVERS: kafka:29092
+
+  akhq:
+    image: tchiotludo/akhq
+    container_name: akhq
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka-server:
+              properties:
+                bootstrap.servers: "kafka:29092"
+    ports:
+      - "8082:8080"

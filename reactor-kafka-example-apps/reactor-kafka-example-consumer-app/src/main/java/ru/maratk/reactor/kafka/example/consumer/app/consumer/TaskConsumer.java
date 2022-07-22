@@ -8,7 +8,9 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.stereotype.Component;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.kafka.receiver.KafkaReceiver;
@@ -18,8 +20,10 @@ import ru.maratk.reactor.kafka.example.consumer.app.retry.ControlledRetry;
 import ru.maratk.reactor.kafka.example.consumer.app.service.TaskService;
 import ru.maratk.reactor.kafka.example.core.lib.Task;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Component
 public class TaskConsumer {
@@ -62,7 +66,7 @@ public class TaskConsumer {
                 .just(flux)
                 .concatMap(processPartition())
                 .retryWhen(controlledRetry)
-                .doOnError(onPartitionError());
+                .onErrorResume(onPartitionError());
     }
 
     private Function<ReceiverRecord<String, Task>, Publisher<?>> processPartition() {
@@ -74,7 +78,13 @@ public class TaskConsumer {
             return taskService.process(rr.value())
                     .then(rr.receiverOffset().commit())
                     .doOnSuccess(logOnPartitionSuccess(rr))
-                    .doOnError(logOnPartitionError(rr));
+                    .doOnError(e -> {
+                        logger.info("Committing offset failed for key {}: offset: {} partition: {}"
+                                , rr.key()
+                                , rr.receiverOffset().offset()
+                                , rr.receiverOffset().topicPartition().partition());
+                        throw Exceptions.propagate(new ReceiverRecordException(rr, new RuntimeException("test")));
+                    });
         };
     }
 
@@ -86,14 +96,7 @@ public class TaskConsumer {
                 , rr.receiverOffset().topicPartition().partition());
     }
 
-    private Consumer logOnPartitionError(final ReceiverRecord<String, Task> rr){
-        return r -> logger.info("Committing offset failed for key {}: offset: {} partition: {}"
-                , rr.key()
-                , rr.receiverOffset().offset()
-                , rr.receiverOffset().topicPartition().partition());
-    }
-
-    private Consumer<Throwable> onPartitionError(){
+    private Function<Throwable, Publisher<?>> onPartitionError(){
         return (e) -> {
             final ReceiverRecordException ex = (ReceiverRecordException) e;
             logger.error("Retries exhausted for key {}: offset: {} partition: {}"
@@ -103,6 +106,7 @@ public class TaskConsumer {
                     , ex);
             deadLetterPublishingRecoverer.accept(ex.getRecord(), ex);
             ex.getRecord().receiverOffset().acknowledge();
+            return Mono.empty();
         };
     }
 }
