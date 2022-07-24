@@ -27,6 +27,12 @@
       <artifactId>spring-kafka</artifactId>
       <version>${spring.kafka.version}</version>
     </dependency>
+    <!-- Kafka Streams -->
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-streams</artifactId>
+      <version>${kafka.streams.version}</version>
+    </dependency>
     <!-- Reactor Kafka -->
     <dependency>
       <groupId>io.projectreactor.kafka</groupId>

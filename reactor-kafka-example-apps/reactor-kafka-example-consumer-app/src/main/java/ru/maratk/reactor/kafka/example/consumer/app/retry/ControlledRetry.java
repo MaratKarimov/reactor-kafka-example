@@ -11,12 +11,12 @@ import reactor.util.retry.Retry;
 public final class ControlledRetry extends Retry {
 
     private final int numRetries;
-    private final Long slowPauseMs;
+    private final Long fastPauseMs;
 
     public ControlledRetry(@Value("${num.retries}") final int numRetries
-            , @Value("${slow.pause.ms}") final Long slowPauseMs) {
+            , @Value("${fast.pause.ms}") final Long fastPauseMs) {
         this.numRetries = numRetries;
-        this.slowPauseMs = slowPauseMs;
+        this.fastPauseMs = fastPauseMs;
     }
 
     @Override
@@ -25,7 +25,7 @@ public final class ControlledRetry extends Retry {
     }
 
     private Long getNumberOfTries(final Retry.RetrySignal rs) {
-        try { Thread.sleep(slowPauseMs); } catch (final InterruptedException e) {}
+        try { Thread.sleep(fastPauseMs); } catch (final InterruptedException e) {}
         if (rs.totalRetries() < numRetries) { return rs.totalRetries(); }
         else { throw Exceptions.propagate(rs.failure()); }
     }

@@ -21,7 +21,6 @@ services:
       - "ZOOKEEPER_TICK_TIME=2000"
       - "ZOOKEEPER_LOG4J_ROOT_LOGLEVEL=ERROR"
       - "ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL=ERROR"
-
   kafka:
     image: confluentinc/cp-kafka:7.2.1
     depends_on:
@@ -47,7 +46,6 @@ services:
     environment:
       KAFKA_REST_LISTENERS: http://0.0.0.0:8081
       KAFKA_REST_BOOTSTRAP_SERVERS: kafka:29092
-
   akhq:
     image: tchiotludo/akhq
     container_name: akhq
