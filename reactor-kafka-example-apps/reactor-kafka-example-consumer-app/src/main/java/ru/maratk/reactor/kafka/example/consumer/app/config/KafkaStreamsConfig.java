@@ -41,6 +41,7 @@ public class KafkaStreamsConfig {
             put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServers);
             put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.ByteArray().getClass());
             put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.ByteArray().getClass());
+            put(StreamsConfig.EXACTLY_ONCE_V2, true);
         }};
         return params;
     }
