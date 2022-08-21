@@ -1,9 +1,11 @@
 package ru.maratk.reactor.kafka.example.consumer.app.consumer;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
@@ -20,13 +22,13 @@ import ru.maratk.reactor.kafka.example.consumer.app.retry.ControlledRetry;
 import ru.maratk.reactor.kafka.example.consumer.app.service.TaskService;
 import ru.maratk.reactor.kafka.example.core.lib.Task;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 @Component
 public class TaskConsumer {
+
+    private final Integer maxRetries;
 
     private final KafkaReceiver<String, Task> kafkaReceiver;
     private final TaskService taskService;
@@ -39,11 +41,12 @@ public class TaskConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskConsumer.class);
 
-    @Autowired
-    public TaskConsumer(final KafkaReceiver<String, Task> kafkaReceiver
-            , final TaskService taskService
-            , final ControlledRetry controlledRetry
-            , final DeadLetterPublishingRecoverer deadLetterPublishingRecoverer) {
+    public TaskConsumer(@Value(value = "${max.retries}") final Integer maxRetries
+            , @Autowired final KafkaReceiver<String, Task> kafkaReceiver
+            , @Autowired final TaskService taskService
+            , @Autowired final ControlledRetry controlledRetry
+            , @Autowired final DeadLetterPublishingRecoverer deadLetterPublishingRecoverer) {
+        this.maxRetries = maxRetries;
         this.kafkaReceiver = kafkaReceiver;
         this.taskService = taskService;
         this.controlledRetry = controlledRetry;
@@ -101,14 +104,33 @@ public class TaskConsumer {
     private Function<Throwable, Publisher<?>> onPartitionError(){
         return (e) -> {
             final ReceiverRecordException ex = (ReceiverRecordException) e;
-            logger.error("Retries exhausted for key {}: offset: {} partition: {}"
-                    , ex.getRecord().key()
-                    , ex.getRecord().receiverOffset().offset()
-                    , ex.getRecord().receiverOffset().topicPartition().partition()
-                    , ex);
-            deadLetterPublishingRecoverer.accept(ex.getRecord(), ex);
+            final ReceiverRecord<String, Task> receiverRecord = ex.getRecord();
+            if(receiverRecord.value().findSafelyInternalResendCounter() < maxRetries) {
+                logger.error("Fast retries exhausted for key {}: offset: {} partition: {}"
+                        , receiverRecord.key()
+                        , receiverRecord.receiverOffset().offset()
+                        , receiverRecord.receiverOffset().topicPartition().partition()
+                        , ex);
+                deadLetterPublishingRecoverer.accept(incrementInternalResendCounter(receiverRecord), ex);
+            } else {
+                logger.error("Slow retries exhausted for key: {}, offset: {}, partition: {}"
+                        , receiverRecord.key()
+                        , receiverRecord.receiverOffset().offset()
+                        , receiverRecord.receiverOffset().topicPartition().partition()
+                        , ex);
+            }
             ex.getRecord().receiverOffset().acknowledge();
             return Mono.empty();
         };
+    }
+
+    private ConsumerRecord<String, Task> incrementInternalResendCounter(final ConsumerRecord<String, Task> c){
+        final Task task = c.value();
+        final Task updatedTask = Task.TaskBuilder.aTask()
+                .withName(task.getName())
+                .withPriority(task.getPriority())
+                .withInternalResendCounter(task.findSafelyInternalResendCounter() + 1)
+                .build();
+        return new ConsumerRecord<>(c.topic(), c.partition(), c.offset(), c.key(), updatedTask);
     }
 }

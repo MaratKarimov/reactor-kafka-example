@@ -17,8 +17,8 @@ public class TaskDao {
 
     public Mono<Integer> insert(final ru.maratk.reactor.kafka.example.core.lib.Task task){
         final String sql = dslContext.insertInto(Task.TASK)
-                .columns(Task.TASK.NAME, Task.TASK.PRIORITY)
-                .values(task.getName(), task.getPriority())
+                .columns(Task.TASK.NAME, Task.TASK.PRIORITY, Task.TASK.INTERNAL_RESEND_COUNTER)
+                .values(task.getName(), task.getPriority(), task.findSafelyInternalResendCounter())
                 .getSQL(ParamType.INLINED);
         return databaseClient
                 .sql(sql)

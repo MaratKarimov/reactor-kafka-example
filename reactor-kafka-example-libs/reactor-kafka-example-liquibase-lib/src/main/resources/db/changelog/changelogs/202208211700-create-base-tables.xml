@@ -13,4 +13,10 @@ CREATE TABLE IF NOT EXISTS public.task (
 ]]>
         </sql>
     </changeSet>
+    <changeSet id="add-internal-resend-counter-field-to-task-table" author="mkarimov">
+        <sql><![CDATA[
+ALTER TABLE public.task ADD COLUMN internal_resend_counter INTEGER NOT NULL DEFAULT 0;
+]]>
+        </sql>
+    </changeSet>
 </databaseChangeLog>
