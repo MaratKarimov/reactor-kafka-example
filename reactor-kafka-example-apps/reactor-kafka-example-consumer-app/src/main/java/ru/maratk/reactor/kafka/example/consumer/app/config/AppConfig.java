@@ -10,7 +10,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 
 @Configuration
-@Import({KafkaConsumerConfig.class, KafkaProducerConfig.class, KafkaStreamsConfig.class})
+@Import({KafkaConsumerConfig.class, KafkaProducerConfig.class, KafkaStreamsConfig.class, PostgreSQLConnectionFactoryConfig.class})
 public class AppConfig {
 
     @Value("${task.dlq.topic}")
