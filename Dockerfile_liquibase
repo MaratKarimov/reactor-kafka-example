@@ -1,0 +1,7 @@
+FROM liquibase/liquibase:4.15.0
+COPY reactor-kafka-example-libs/reactor-kafka-example-liquibase-lib/target/reactor-kafka-example-liquibase-lib.jar .
+COPY docker/liquibase/docker-entrypoint.sh .
+USER root
+RUN apt update && apt install dos2unix netcat -y
+RUN chmod +x docker-entrypoint.sh && dos2unix docker-entrypoint.sh
+ENTRYPOINT docker-entrypoint.sh

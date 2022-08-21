@@ -5,6 +5,8 @@ services:
     depends_on:
       - zookeeper
       - kafka
+      - postgresql
+      - liquibase
     build:
       context: './reactor-kafka-example-apps/reactor-kafka-example-consumer-app'
     environment:
@@ -12,8 +14,31 @@ services:
       - "TASK_TOPIC=task"
       - "TASK_DLQ_TOPIC=task-dlq"
       - "NUM_RETRIES=2"
-      - "SLOW_PAUSE_MS=2000"
+      - "SLOW_PAUSE_MS=5000"
       - "SERVICE_FAIL_ON=4"
+      - "STORAGE_DATASOURCE_USERNAME=test"
+      - "STORAGE_DATASOURCE_PASSWORD=test"
+      - "STORAGE_DATASOURCE_JDBCURL=jdbc:postgresql://postgresql:5432/test"
+
+  postgresql:
+    image: "postgres:14-alpine"
+    environment:
+      - "POSTGRES_USER=test"
+      - "POSTGRES_PASSWORD=test"
+      - "POSTGRES_DB=test"
+      - "TIMESCALEDB_TELEMETRY=off"
+
+  liquibase:
+    build:
+      context: './'
+      dockerfile: 'Dockerfile_liquibase'
+    environment:
+      - "POSTGRES_HOST=postgresql"
+      - "POSTGRES_PORT=5432"
+      - "POSTGRES_USER=test"
+      - "POSTGRES_PASSWORD=test"
+      - "POSTGRES_DB=test"
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.2.1
     environment:
@@ -21,6 +46,7 @@ services:
       - "ZOOKEEPER_TICK_TIME=2000"
       - "ZOOKEEPER_LOG4J_ROOT_LOGLEVEL=ERROR"
       - "ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL=ERROR"
+
   kafka:
     image: confluentinc/cp-kafka:7.2.1
     depends_on:
@@ -46,6 +72,7 @@ services:
     environment:
       KAFKA_REST_LISTENERS: http://0.0.0.0:8081
       KAFKA_REST_BOOTSTRAP_SERVERS: kafka:29092
+
   akhq:
     image: tchiotludo/akhq
     container_name: akhq

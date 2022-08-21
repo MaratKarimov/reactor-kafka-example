@@ -17,6 +17,8 @@
 
   <modules>
     <module>reactor-kafka-example-core-lib</module>
+    <module>reactor-kafka-example-liquibase-lib</module>
+    <module>reactor-kafka-example-jooq-lib</module>
+    <module>reactor-kafka-example-dao-lib</module>
   </modules>
-
 </project>

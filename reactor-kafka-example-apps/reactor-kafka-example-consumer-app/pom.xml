@@ -21,6 +21,12 @@
       <artifactId>reactor-kafka-example-core-lib</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
+    <!-- DAO -->
+    <dependency>
+      <groupId>ru.maratk</groupId>
+      <artifactId>reactor-kafka-example-dao-lib</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
     <!-- Spring Kafka -->
     <dependency>
       <groupId>org.springframework.kafka</groupId>
@@ -43,16 +49,22 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
     </dependency>
-    <!-- Spring Boot Data R2DBC -->
+    <!-- R2DBC SPI -->
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-r2dbc</artifactId>
+      <groupId>io.r2dbc</groupId>
+      <artifactId>r2dbc-spi</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <!-- R2DBC Pool -->
+    <dependency>
+      <groupId>io.r2dbc</groupId>
+      <artifactId>r2dbc-pool</artifactId>
+      <scope>compile</scope>
     </dependency>
     <!-- R2DBC PostgreSQL -->
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>r2dbc-postgresql</artifactId>
-      <version>1.0.0.RC1</version>
       <exclusions>
         <exclusion>
           <groupId>io.projectreactor.netty</groupId>
@@ -64,13 +76,12 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.4.2</version>
+      <version>${pg.jdbc.driver.version}</version>
     </dependency>
     <!-- jUnit -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
     <!-- Testcontainers PostgreSQL -->

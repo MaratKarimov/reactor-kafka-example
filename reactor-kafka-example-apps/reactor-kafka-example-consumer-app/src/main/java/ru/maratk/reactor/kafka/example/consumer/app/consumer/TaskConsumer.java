@@ -79,10 +79,12 @@ public class TaskConsumer {
                     .then(rr.receiverOffset().commit())
                     .doOnSuccess(logOnPartitionSuccess(rr))
                     .doOnError(e -> {
+                        final String topicPartition = rr.receiverOffset().topicPartition() != null
+                                ? Integer.toString(rr.receiverOffset().topicPartition().partition()) : "unknown";
                         logger.info("Committing offset failed for key {}: offset: {} partition: {}"
                                 , rr.key()
                                 , rr.receiverOffset().offset()
-                                , rr.receiverOffset().topicPartition().partition());
+                                , topicPartition);
                         throw Exceptions.propagate(new ReceiverRecordException(rr, new RuntimeException("test")));
                     });
         };

@@ -19,6 +19,9 @@
     <kafka.streams.version>3.1.1</kafka.streams.version>
     <spring.kafka.version>2.9.0</spring.kafka.version>
     <spring.boot.version>2.7.3</spring.boot.version>
+    <pg.jdbc.driver.version>42.4.2</pg.jdbc.driver.version>
+    <liquibase.version>4.15.0</liquibase.version>
+    <jooq.version>3.14.16</jooq.version>
     <testcontainers.version>1.17.3</testcontainers.version>
   </properties>
 

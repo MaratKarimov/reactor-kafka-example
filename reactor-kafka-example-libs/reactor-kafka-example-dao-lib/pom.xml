@@ -10,14 +10,27 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>reactor-kafka-example-core-lib</artifactId>
+  <artifactId>reactor-kafka-example-dao-lib</artifactId>
 
-  <name>reactor-kafka-example-core-lib</name>
+  <name>reactor-kafka-example-dao-lib</name>
 
   <dependencies>
+    <!-- Core -->
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
+      <groupId>ru.maratk</groupId>
+      <artifactId>reactor-kafka-example-core-lib</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <!-- jOOQ -->
+    <dependency>
+      <groupId>ru.maratk</groupId>
+      <artifactId>reactor-kafka-example-jooq-lib</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <!-- Spring R2DBC -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-r2dbc</artifactId>
     </dependency>
   </dependencies>
 

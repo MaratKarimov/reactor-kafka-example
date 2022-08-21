@@ -9,12 +9,12 @@ import org.postgresql.PGProperty;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
+import org.springframework.r2dbc.core.DatabaseClient;
 
 import java.util.Properties;
 
 @Configuration
-public class PostgreSQLConnectionFactoryConfig extends AbstractR2dbcConfiguration {
+public class PostgreSQLConnectionFactoryConfig {
 
     @Value("${storage.datasource.jdbcUrl}")
     private String jdbcUrl;
@@ -29,7 +29,6 @@ public class PostgreSQLConnectionFactoryConfig extends AbstractR2dbcConfiguratio
     @Value("${storage.datasource.pool.max-size}")
     private Integer poolMaxSize;
 
-    @Override
     @Bean
     public ConnectionFactory connectionFactory() {
         final ConnectionPoolConfiguration connectionPoolConfiguration = ConnectionPoolConfiguration
@@ -50,6 +49,14 @@ public class PostgreSQLConnectionFactoryConfig extends AbstractR2dbcConfiguratio
                 .option(ConnectionFactoryOptions.HOST, jdbcProps.getProperty(PGProperty.PG_HOST.getName()))
                 .option(ConnectionFactoryOptions.PORT, Integer.valueOf(jdbcProps.getProperty(PGProperty.PG_PORT.getName())))
                 .option(ConnectionFactoryOptions.DATABASE, jdbcProps.getProperty(PGProperty.PG_DBNAME.getName()))
+                .build();
+    }
+
+    @Bean
+    DatabaseClient databaseClient(final ConnectionFactory connectionFactory) {
+        return DatabaseClient.builder()
+                .connectionFactory(connectionFactory)
+                .namedParameters(true)
                 .build();
     }
 }
