@@ -15,11 +15,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <reactor.bom.version>2020.0.22</reactor.bom.version>
+    <reactor.bom.version>2020.0.24</reactor.bom.version>
     <kafka.streams.version>3.1.1</kafka.streams.version>
     <spring.kafka.version>2.9.0</spring.kafka.version>
-    <spring.boot.version>2.7.3</spring.boot.version>
-    <pg.jdbc.driver.version>42.4.2</pg.jdbc.driver.version>
+    <spring.boot.version>2.7.5</spring.boot.version>
+    <pg.jdbc.driver.version>42.5.0</pg.jdbc.driver.version>
     <liquibase.version>4.15.0</liquibase.version>
     <jooq.version>3.14.16</jooq.version>
     <testcontainers.version>1.17.3</testcontainers.version>
