@@ -1,5 +1,6 @@
 package ru.maratk.reactor.kafka.example.consumer.app.config;
 
+import io.r2dbc.spi.ConnectionFactory;
 import org.apache.kafka.common.TopicPartition;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -25,7 +26,7 @@ public class AppConfig {
     }
 
     @Bean
-    TaskDao taskDao(final DatabaseClient databaseClient){
-        return new TaskDao(databaseClient, DSL.using(SQLDialect.POSTGRES));
+    TaskDao taskDao(final ConnectionFactory connectionFactory){
+        return new TaskDao(DSL.using(connectionFactory));
     }
 }
