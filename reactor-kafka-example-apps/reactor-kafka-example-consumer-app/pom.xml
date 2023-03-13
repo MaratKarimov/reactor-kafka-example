@@ -31,18 +31,22 @@
     <dependency>
       <groupId>org.springframework.kafka</groupId>
       <artifactId>spring-kafka</artifactId>
-      <version>${spring.kafka.version}</version>
     </dependency>
     <!-- Kafka Streams -->
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka-streams</artifactId>
-      <version>${kafka.streams.version}</version>
     </dependency>
     <!-- Reactor Kafka -->
     <dependency>
       <groupId>io.projectreactor.kafka</groupId>
       <artifactId>reactor-kafka</artifactId>
+        <exclusions>
+            <exclusion>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+            </exclusion>
+        </exclusions>
     </dependency>
     <!-- Spring Boot Starter -->
     <dependency>
@@ -118,8 +122,10 @@
           </execution>
         </executions>
         <configuration>
-          <executable>true</executable>
-          <includeSystemScope>true</includeSystemScope>
+          <executable>false</executable>
+          <layers>
+            <enabled>true</enabled>
+          </layers>
           <finalName>${project.name}</finalName>
         </configuration>
       </plugin>

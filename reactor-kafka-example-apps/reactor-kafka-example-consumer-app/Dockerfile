@@ -1,9 +1,9 @@
-FROM adoptopenjdk/openjdk17:alpine as builder
-ARG JAR_FILE=target/*.jar
+FROM eclipse-temurin:17-alpine as builder
+ARG JAR_FILE=target/reactor-kafka-example-consumer-app.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
-FROM adoptopenjdk/openjdk17:alpine
+FROM eclipse-temurin:17-alpine
 EXPOSE 8080
 RUN apk add --no-cache tzdata bind-tools iputils nmap curl busybox-extras && \
  addgroup --gid 10001 app && \

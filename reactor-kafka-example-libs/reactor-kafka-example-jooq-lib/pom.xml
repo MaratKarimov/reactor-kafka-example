@@ -25,7 +25,6 @@
     <dependency>
       <groupId>org.jooq</groupId>
       <artifactId>jooq</artifactId>
-      <version>${jooq.version}</version>
     </dependency>
   </dependencies>
 
@@ -97,7 +96,6 @@
       <plugin>
         <groupId>org.jooq</groupId>
         <artifactId>jooq-codegen-maven</artifactId>
-        <version>${jooq.version}</version>
         <executions>
           <execution>
             <id>java-generator</id>
