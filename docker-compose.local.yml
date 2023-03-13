@@ -60,7 +60,21 @@ services:
       - "KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1"
       - "KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1"
       - "KAFKA_LOG4J_ROOT_LOGLEVEL=ERROR"
+      - "KAFKA_LOG4J_LOGGERS=kafka.producer.async.DefaultEventHandler=ERROR,kafka.controller=ERROR,state.change.logger=ERROR"
       - "KAFKA_TOOLS_LOG4J_LOGLEVEL=ERROR"
+
+  kafka-setup:
+    image: "confluentinc/cp-kafka:7.2.1"
+    depends_on:
+      - kafka
+    command: "bash -c 'echo Waiting for Kafka to be ready... && \
+                       cub kafka-ready -b kafka:29092 1 40 && \
+                       kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 4 --replication-factor 1 --topic task && \
+                       kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 4 --replication-factor 1 --topic task-dlq'"
+    environment:
+      - "KAFKA_BROKER_ID=ignored"
+      - "KAFKA_ZOOKEEPER_CONNECT=ignored"
+
 
   kafka-rest:
     image: confluentinc/cp-kafka-rest:7.2.1

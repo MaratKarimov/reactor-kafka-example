@@ -1,7 +1,5 @@
 package ru.maratk.reactor.kafka.example.consumer.app.config;
 
-import org.apache.kafka.clients.admin.AdminClientConfig;
-import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
@@ -12,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
-import org.springframework.kafka.core.KafkaAdmin;
 import ru.maratk.reactor.kafka.example.consumer.app.kstreams.TimeDelayProcessor;
 
 import java.util.HashMap;
@@ -58,22 +55,5 @@ public class KafkaStreamsConfig {
                 .addSource("processorSource", deadLetterTopic)
                 .addProcessor("processor", this::timeDelayProcessor, "processorSource")
                 .addSink("sink", topic, "processor");
-    }
-
-    @Bean
-    public KafkaAdmin admin() {
-        Map<String, Object> props = new HashMap<>();
-        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServers);
-        return new KafkaAdmin(props);
-    }
-
-    @Bean
-    NewTopic taskTopic() {
-        return new NewTopic(topic, 4, (short) 1);
-    }
-
-    @Bean
-    NewTopic counterTopic() {
-        return new NewTopic(deadLetterTopic, 4, (short) 1);
     }
 }
