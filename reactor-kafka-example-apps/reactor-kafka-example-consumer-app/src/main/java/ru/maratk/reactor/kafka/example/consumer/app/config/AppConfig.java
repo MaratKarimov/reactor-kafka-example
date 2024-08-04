@@ -17,7 +17,7 @@ import ru.maratk.reactor.kafka.example.dao.TaskDao;
 @Import({KafkaConsumerConfig.class, KafkaProducerConfig.class, KafkaStreamsConfig.class, PostgreSQLConnectionFactoryConfig.class})
 public class AppConfig {
 
-    @Value("${task.dlq.topic}")
+    @Value("${task.dlq.topic1}")
     private String deadLetterTopic;
 
     @Bean
